@@ -9,7 +9,7 @@ setup(
         "hc_xps": ["spectrum_config/*.toml"]
     },
     install_requires=['numpy', 'matplotlib', 'lmfit'],
-    python_requires='>=3.10',
+    python_requires='>=3.11',
     author='Piotr Toka',
     author_email='pnt17@ic.ac.uk',
     description='A package for XPS data analysis of hard carbon materials',
