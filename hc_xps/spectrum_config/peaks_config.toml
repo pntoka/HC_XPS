@@ -1,0 +1,73 @@
+[carbon]
+
+[carbon.models]
+5peaks = "A+B+C+D+E"
+4peaks = "A+B+C+E"
+
+[carbon.peaks]
+
+
+[carbon.peaks.A]
+docstring ="""
+C-C (sp3 carbon)
+"""
+peak_name = "A"
+peak_type = "Voigt"
+[carbon.peaks.A.param_hints]
+center = {value = 284.8, min = 284.5, max = 285}
+amplitude = {value = 133000, min = 100, max = 5e5}
+sigma = {value = 0.68, min = 0.1, max = 1}
+gamma = {vary = True, expr =''}
+mix = {vary = False, value = 0.2, min = 0.01, max = 1}
+
+
+[carbon.peaks.B]
+docstring ="""
+C-O-C
+"""
+peak_name = "B"
+peak_type = "Voigt"
+[carbon.peaks.B.param_hints]
+center = {value = 286, min = 285, max = 287}
+amplitude = {value = 26000, min = 100, max = 5e5}
+sigma = {value = 0.68, min = 0.1, max = 1}
+gamma = {vary = True, expr =''}
+
+
+[carbon.peaks.C]
+docstring ="""
+C=0
+"""
+peak_name = "C"
+peak_type = "Voigt"
+[carbon.peaks.C.param_hints]
+center = {value = 289, min = 288, max = 290}
+amplitude = {value = 12500, min = 100, max = 4e5}
+sigma = {value = 0.68, min = 0.1, max = 1}
+gamma = {vary = True, expr =''}
+
+
+[carbon.peaks.D]
+docstring ="""
+shake up
+"""
+peak_name = "D"
+peak_type = "Voigt"
+[carbon.peaks.D.param_hints]
+center = {value = 290.2, min = 289, max = 291}
+amplitude = {value = 8200, min = 100, max = 2e4}
+sigma = {value = 0.68, min = 0.1, max = 1}
+gamma = {vary = True, expr =''}
+
+
+[carbon.peaks.E]
+docstring ="""
+C=C (sp2 carbon)
+"""
+peak_name = "E"
+peak_type = "Voigt"
+[carbon.peaks.E.param_hints]
+center = {value = 284.3, min = 283, max = 284.6}
+amplitude = {value = 160000, min = 100, max = 5e5}
+sigma = {value = 0.68, min = 0.1, max = 1}
+gamma = {vary = True, expr =''}
