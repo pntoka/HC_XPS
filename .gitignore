@@ -1,0 +1,8 @@
+.DS_Store
+*.pyc
+hc_xps.egg-info/top_level.txt
+hc_xps.egg-info/SOURCES.txt
+hc_xps.egg-info/requires.txt
+hc_xps.egg-info/PKG-INFO
+hc_xps.egg-info/dependency_links.txt
+/build/*
