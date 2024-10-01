@@ -17,8 +17,7 @@ peak_type = "Voigt"
 center = {value = 284.8, min = 284.5, max = 285}
 amplitude = {value = 133000, min = 100, max = 5e5}
 sigma = {value = 0.68, min = 0.1, max = 1}
-gamma = {vary = True, expr =''}
-mix = {vary = False, value = 0.2, min = 0.01, max = 1}
+mix = {value = 0.2, min = 0.01, max = 1}
 
 
 [carbon.peaks.B]
@@ -31,12 +30,12 @@ peak_type = "Voigt"
 center = {value = 286, min = 285, max = 287}
 amplitude = {value = 26000, min = 100, max = 5e5}
 sigma = {value = 0.68, min = 0.1, max = 1}
-gamma = {vary = True, expr =''}
+mix = {value = 0.2, min = 0.01, max = 1}
 
 
 [carbon.peaks.C]
 docstring ="""
-C=0
+C=O
 """
 peak_name = "C"
 peak_type = "Voigt"
@@ -44,7 +43,7 @@ peak_type = "Voigt"
 center = {value = 289, min = 288, max = 290}
 amplitude = {value = 12500, min = 100, max = 4e5}
 sigma = {value = 0.68, min = 0.1, max = 1}
-gamma = {vary = True, expr =''}
+mix = {value = 0.2, min = 0.01, max = 1}
 
 
 [carbon.peaks.D]
@@ -57,7 +56,7 @@ peak_type = "Voigt"
 center = {value = 290.2, min = 289, max = 291}
 amplitude = {value = 8200, min = 100, max = 2e4}
 sigma = {value = 0.68, min = 0.1, max = 1}
-gamma = {vary = True, expr =''}
+mix = {value = 0.2, min = 0.01, max = 1}
 
 
 [carbon.peaks.E]
@@ -70,4 +69,4 @@ peak_type = "Voigt"
 center = {value = 284.3, min = 283, max = 284.6}
 amplitude = {value = 160000, min = 100, max = 5e5}
 sigma = {value = 0.68, min = 0.1, max = 1}
-gamma = {vary = True, expr =''}
+mix = {value = 0.2, min = 0.01, max = 1}

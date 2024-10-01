@@ -66,16 +66,29 @@ def prepare_xps(start_energy, end_energy, energy, intensity):
     # end_idx = np.where(energy == end_energy)[0][0]
     i_left = np.mean(intensity[start_idx-2:start_idx+2])
     i_right = np.mean(intensity[end_idx-2:end_idx+2])
-    new_xps = np.copy(intensity)
+    new_xps = np.copy(intensity[start_idx:end_idx])
     new_xps[0] = i_left
     new_xps[-1] = i_right
-    return new_xps
+    return new_xps, start_idx, end_idx
 
 
 def get_shirley_background(energy, intensity, start_energy, end_energy):
     """
     Function to calculate shirley background of xps data.
     """
-    xps = prepare_xps(start_energy, end_energy, energy, intensity)
+    xps, start_idx, end_idx = prepare_xps(start_energy, end_energy, energy, intensity)
     background = _calculate_shirley_background_full_range(xps)
-    return background
+    energy_bkg = energy[start_idx:end_idx]
+    bkg = np.vstack((energy_bkg, background))
+    return bkg
+
+
+def remove_background(energy, intensity, start_energy, end_energy):
+    """
+    Function to remove shirley background from xps data.
+    """
+    xps, start_idx, end_idx = prepare_xps(start_energy, end_energy, energy, intensity)
+    background = _calculate_shirley_background_full_range(xps)
+    intensity = intensity[start_idx:end_idx]
+    intensity = intensity - background
+    return energy[start_idx:end_idx], intensity
