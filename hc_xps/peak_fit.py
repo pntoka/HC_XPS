@@ -21,6 +21,10 @@ def build_lmfit_model(model='5peaks', element='carbon', fixed_peaks=None, fixed_
     for peak in peaks:
         peak_model = eval(peaks_config[element]['peaks'][peak]['peak_type']+f'Model(prefix="{peak}_")')
         for hint in peaks_config[element]['peaks'][peak]['param_hints']:
+            if (fixed_mix is None and mix is None) and (hint == 'mix'):
+                continue
+            # if mix is None and hint == 'mix':
+            #     continue
             peak_model.set_param_hint(f'{peak}_{hint}', **peaks_config[element]['peaks'][peak]['param_hints'][hint])
         model_list.append(peak_model)
     model = model_list[0]
@@ -29,7 +33,8 @@ def build_lmfit_model(model='5peaks', element='carbon', fixed_peaks=None, fixed_
     params = model.make_params()
     for peak in peaks:
         params[f'{peak}_gamma'].set(vary=True, expr='')
-        params[f'{peak}_mix'].set(vary=False)
+        if fixed_mix is not None or mix is not None:
+            params[f'{peak}_mix'].set(vary=False)
     if mix is not None:
         for peak in peaks:
             params[f'{peak}_mix'].set(value=mix, vary=True)

@@ -26,8 +26,8 @@ def plot_full_peak_fit(result, energy, intensity, background, model='5peaks', el
     peaks = peaks_config[element]['models'][model].split('+')
     for peak in peaks:
         ax.plot(background[0], comps[f'{peak}_']+background[1], linestyle='--', label=peaks_config[element]['peaks'][peak]['docstring'].strip())
-    ax.plot(background[0], result.best_fit+background[1], label='Fit', linestyle='-.')
     ax.plot(energy, intensity, label='XPS Data')
+    ax.plot(background[0], result.best_fit+background[1], label='Fit', linestyle='-.')
     ax.plot(background[0], background[1], label='Background')
     ax.legend()
     ax.set_xlabel("Binding Energy (eV)")
