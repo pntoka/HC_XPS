@@ -1,15 +1,21 @@
 [carbon]
 
 [carbon.models]
-5peaks = "A+B+C+D+E"
+5peaks = "A+B+C+F+E"
 4peaks = "A+B+C+E"
+5peaks_SV = "Asv+Bsv+Csv+Fsv+Esv"
+6peaks_SV = "Asv+Bsv+Csv+Dsv+Esv+Fsv"
+casa_xps = "A+B+C+D+E+F"
+casa_xps_la = "A+B+C+D+Ela+F"
+casa_xps_la_sv = "Asv+Bsv+Csv+Dsv+Ela+Fsv"
+
 
 [carbon.peaks]
 
 
 [carbon.peaks.A]
 docstring ="""
-C-C (sp3 carbon)
+C-C, C-H
 """
 peak_name = "A"
 peak_type = "Voigt"
@@ -19,12 +25,28 @@ amplitude = {value = 133000, min = 100, max = 5e5}
 sigma = {value = 0.68, min = 0.1, max = 1}
 gamma = {value = 0.16, min = 0.05, max = 0.6}
 fwhm = {value = 1.8, min = 0.5, max = 3.5}
+mix = {value = 0.3, min = 0.01, max = 1}
+
+
+[carbon.peaks.Asv]
+docstring ="""
+C-C, C-H
+"""
+peak_name = "Asv"
+peak_type = "SkewedVoigt"
+[carbon.peaks.Asv.param_hints]
+center = {value = 284.8, min = 284.5, max = 285}
+amplitude = {value = 133000, min = 100, max = 5e5}
+sigma = {value = 0.68, min = 0.1, max = 1}
+gamma = {value = 0.16, min = 0.05, max = 0.6}
+fwhm = {value = 1.1, min = 0.5, max = 3.5}
 mix = {value = 0.2, min = 0.01, max = 1}
+skew = {value = 0, min = 0, max = 1000}
 
 
 [carbon.peaks.B]
 docstring ="""
-C-O-C
+C-O-C, C-OH
 """
 peak_name = "B"
 peak_type = "Voigt"
@@ -37,9 +59,25 @@ fwhm = {value = 1.8, min = 0.5, max = 3.5}
 mix = {value = 0.2, min = 0.01, max = 1}
 
 
+[carbon.peaks.Bsv]
+docstring ="""
+C-O-C
+"""
+peak_name = "Bsv"
+peak_type = "SkewedVoigt"
+[carbon.peaks.Bsv.param_hints]
+center = {value = 286, min = 285, max = 287}
+amplitude = {value = 26000, min = 100, max = 5e5}
+sigma = {value = 0.68, min = 0.1, max = 1}
+gamma = {value = 0.16, min = 0.05, max = 0.6}
+fwhm = {value = 1.1, min = 0.5, max = 3.5}
+mix = {value = 0.2, min = 0.01, max = 1}
+skew = {value = 0, min = 0, max = 1000}
+
+
 [carbon.peaks.C]
 docstring ="""
-C=O
+O-C=O
 """
 peak_name = "C"
 peak_type = "Voigt"
@@ -52,24 +90,86 @@ fwhm = {value = 1.8, min = 0.5, max = 3.5}
 mix = {value = 0.2, min = 0.01, max = 1}
 
 
-[carbon.peaks.D]
+[carbon.peaks.Csv]
 docstring ="""
-π-π* satellite
+O-C=O
+"""
+peak_name = "Csv"
+peak_type = "SkewedVoigt"
+[carbon.peaks.Csv.param_hints]
+center = {value = 289, min = 288, max = 290}
+amplitude = {value = 12500, min = 100, max = 4e5}
+sigma = {value = 0.68, min = 0.1, max = 1}
+gamma = {value = 0.16, min = 0.05, max = 0.6}
+fwhm = {value = 1.1, min = 0.5, max = 3.5}
+mix = {value = 0.2, min = 0.01, max = 1}
+skew = {value = 0, min = 0, max = 1000}
+
+
+[carbon.peaks.D]
+docstring = """
+C=O
 """
 peak_name = "D"
 peak_type = "Voigt"
 [carbon.peaks.D.param_hints]
-center = {value = 290.2, min = 289, max = 291}
-amplitude = {value = 8200, min = 100, max = 2e4}
+center = {value = 288, min = 287, max = 289}
+amplitude = {value = 12500, min = 100, max = 4e5}
 sigma = {value = 0.68, min = 0.1, max = 1}
 gamma = {value = 0.16, min = 0.05, max = 0.6}
 fwhm = {value = 1.8, min = 0.5, max = 3.5}
 mix = {value = 0.2, min = 0.01, max = 1}
 
 
+[carbon.peaks.Dsv]
+docstring = """
+C=O
+"""
+peak_name = "Dsv"
+peak_type = "SkewedVoigt"
+[carbon.peaks.Dsv.param_hints]
+center = {value = 288, min = 287, max = 289}
+amplitude = {value = 12500, min = 100, max = 4e5}
+sigma = {value = 0.68, min = 0.1, max = 1}
+gamma = {value = 0.16, min = 0.05, max = 0.6}
+fwhm = {value = 1.1, min = 0.5, max = 3.5}
+mix = {value = 0.2, min = 0.01, max = 1}
+
+
+[carbon.peaks.F]
+docstring ="""
+π-π* satellite
+"""
+peak_name = "F"
+peak_type = "Voigt"
+[carbon.peaks.F.param_hints]
+center = {value = 290.2, min = 289, max = 291.2}
+amplitude = {value = 8200, min = 100, max = 2e4}
+sigma = {value = 0.68, min = 0.1, max = 1}
+gamma = {value = 0.16, min = 0.05, max = 0.6}
+fwhm = {value = 2.7, min = 0.5, max = 3.5}
+mix = {value = 0.2, min = 0.01, max = 1}
+
+
+[carbon.peaks.Fsv]
+docstring ="""
+π-π* satellite
+"""
+peak_name = "Fsv"
+peak_type = "SkewedVoigt"
+[carbon.peaks.Fsv.param_hints]
+center = {value = 290.2, min = 289, max = 291.2}
+amplitude = {value = 8200, min = 100, max = 2e4}
+sigma = {value = 0.68, min = 0.1, max = 1}
+gamma = {value = 0.16, min = 0.05, max = 0.6}
+fwhm = {value = 2.7, min = 0.5, max = 3.5}
+mix = {value = 0.2, min = 0.01, max = 1}
+skew = {value = 0, min = 0, max = 1000}
+
+
 [carbon.peaks.E]
 docstring ="""
-C=C (sp2 carbon)
+C=C
 """
 peak_name = "E"
 peak_type = "Voigt"
@@ -80,3 +180,33 @@ sigma = {value = 0.68, min = 0.1, max = 1}
 gamma = {value = 0.16, min = 0.05, max = 0.6}
 fwhm = {value = 1.8, min = 0.5, max = 3.5}
 mix = {value = 0.2, min = 0.01, max = 1}
+
+
+[carbon.peaks.Esv]
+docstring ="""
+C=C
+"""
+peak_name = "Esv"
+peak_type = "SkewedVoigt"
+[carbon.peaks.Esv.param_hints]
+center = {value = 284.3, min = 283, max = 284.6}
+amplitude = {value = 160000, min = 100, max = 5e5}
+sigma = {value = 0.68, min = 0.1, max = 1}
+gamma = {value = 0.16, min = 0.05, max = 0.6}
+fwhm = {value = 1.8, min = 0.5, max = 3.5}
+mix = {value = 0.2, min = 0.01, max = 1}
+skew = {value = 0, min = 0, max = 1000}
+
+[carbon.peaks.Ela]
+docstring = """
+C=C
+"""
+peak_name = "Ela"
+peak_type = "LA"
+[carbon.peaks.Ela.param_hints]
+center = {value = 284.3, min = 283, max = 284.6}
+amplitude = {value = 160000, min = 100, max = 5e5}
+fwhm = {value = 1.8, min = 0.5, max = 3.5}
+alpha = {value = 1.0, min = 1.0, max = 15}
+beta = {value = 1.0, min = 1.0, max = 15}
+mix = {value = 0.6, min = 0.4, max = 0.999}

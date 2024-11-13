@@ -22,7 +22,8 @@ def build_lmfit_model(model='5peaks', element='carbon', fixed_peaks=None, fixed_
     for peak in peaks:
         if peak == 'Ela':
             peak_model = Model(LA_conv, prefix='Ela_')
-        peak_model = eval(peaks_config[element]['peaks'][peak]['peak_type']+f'Model(prefix="{peak}_")')
+        else:
+            peak_model = eval(peaks_config[element]['peaks'][peak]['peak_type']+f'Model(prefix="{peak}_")')
         for hint in peaks_config[element]['peaks'][peak]['param_hints']:
             if (fixed_mix is None and mix is None) and (hint == 'mix'):
                 continue
@@ -35,6 +36,8 @@ def build_lmfit_model(model='5peaks', element='carbon', fixed_peaks=None, fixed_
         model += model_list[i]
     params = model.make_params()
     for peak in peaks:
+        if peak == 'Ela':
+            continue
         params[f'{peak}_gamma'].set(vary=True, expr='')
         if fixed_mix is not None or mix is not None:
             params[f'{peak}_mix'].set(vary=False)
@@ -52,8 +55,8 @@ def build_lmfit_model(model='5peaks', element='carbon', fixed_peaks=None, fixed_
             params[f'{peak}_gamma'].set(expr=f'({peak}_mix/(1-{peak}_mix))*sqrt(2*log(2))*{peak}_sigma')
     if fixed_peaks is not None:
         for peak in fixed_peaks:
-            params[f'{peak}_sigma'].set(expr='A_sigma')
-            params[f'{peak}_gamma'].set(expr='A_gamma')
+            params[f'{peak}_sigma'].set(expr=f'{peaks[0]}_sigma')
+            params[f'{peak}_gamma'].set(expr=f'{peaks[0]}_gamma')
 
     return model, params
     
