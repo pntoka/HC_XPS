@@ -15,8 +15,12 @@ def get_peaks_config():
     return peaks_config
 
 
-def build_lmfit_model(model='5peaks', element='carbon', fixed_peaks=None, fixed_mix=None, mix=None):
-    peaks_config = get_peaks_config()
+def build_lmfit_model(model='5peaks', element='carbon', fixed_peaks=None, fixed_mix=None, mix=None, xps_config=None):
+    if xps_config is None:
+        peaks_config = get_peaks_config()
+    else:
+        with open(xps_config, 'rb') as file:
+            peaks_config = tomllib.load(file)
     peaks = peaks_config[element]['models'][model].split('+')
     model_list = []
     for peak in peaks:
@@ -59,10 +63,10 @@ def build_lmfit_model(model='5peaks', element='carbon', fixed_peaks=None, fixed_
             params[f'{peak}_gamma'].set(expr=f'{peaks[0]}_gamma')
 
     return model, params
-    
 
-def fit_peaks(intensity, energy, model='5peaks', element='carbon', fixed_peaks=None, fixed_mix=None, mix=None, method='powell'):
-    model, params = build_lmfit_model(model, element, fixed_peaks, fixed_mix, mix)
+
+def fit_peaks(intensity, energy, model='5peaks', element='carbon', fixed_peaks=None, fixed_mix=None, mix=None, method='powell', xps_config=None):
+    model, params = build_lmfit_model(model, element, fixed_peaks, fixed_mix, mix, xps_config)
     result = model.fit(data=intensity, params=params, x=energy, method=method)
     return result
 

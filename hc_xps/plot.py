@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from hc_xps.peak_fit import get_peaks_config, calculate_rsd
+import tomllib
 
 
 def plot_basic_xps(energy, intensity):
@@ -9,6 +10,7 @@ def plot_basic_xps(energy, intensity):
     plt.ylabel("Intensity (a.u.)")
     plt.gca().invert_xaxis()
     plt.show()
+
 
 def plot_xps_with_background(energy, intensity, background):
     plt.plot(energy, intensity, label='XPS Data')
@@ -19,10 +21,15 @@ def plot_xps_with_background(energy, intensity, background):
     plt.legend()
     plt.show()
 
-def plot_full_peak_fit(result, energy, intensity, background, model='5peaks', element='carbon'):
+
+def plot_full_peak_fit(result, energy, intensity, background, model='5peaks', element='carbon', xps_config=None):
     comps = result.eval_components(x=background[0])
     fig, (ax_residuals, ax_xps) = plt.subplots(2, 1, figsize=(8, 6), sharex=True, gridspec_kw={'height_ratios': [1, 4]})
-    peaks_config = get_peaks_config()
+    if xps_config is None:
+        peaks_config = get_peaks_config()
+    else:
+        with open(xps_config, 'rb') as file:
+            peaks_config = tomllib.load(file)
     peaks = peaks_config[element]['models'][model].split('+')
     for peak in peaks:
         ax_xps.plot(background[0], comps[f'{peak}_']+background[1], linestyle='--', label=peaks_config[element]['peaks'][peak]['docstring'].strip())

@@ -147,7 +147,7 @@ center = {value = 290.2, min = 289, max = 291.2}
 amplitude = {value = 8200, min = 100, max = 2e4}
 sigma = {value = 0.68, min = 0.1, max = 1}
 gamma = {value = 0.16, min = 0.05, max = 0.6}
-fwhm = {value = 2.7, min = 0.5, max = 3.5}
+fwhm = {value = 2.7, min = 2.2, max = 2.9}
 mix = {value = 0.2, min = 0.01, max = 1}
 
 
@@ -162,7 +162,7 @@ center = {value = 290.2, min = 289, max = 291.2}
 amplitude = {value = 8200, min = 100, max = 2e4}
 sigma = {value = 0.68, min = 0.1, max = 1}
 gamma = {value = 0.16, min = 0.05, max = 0.6}
-fwhm = {value = 2.7, min = 0.5, max = 3.5}
+fwhm = {value = 2.7, min = 2.2, max = 2.9}
 mix = {value = 0.2, min = 0.01, max = 1}
 skew = {value = 0, min = 0, max = 1000}
 
@@ -206,7 +206,7 @@ peak_type = "LA"
 [carbon.peaks.Ela.param_hints]
 center = {value = 284.3, min = 283, max = 284.6}
 amplitude = {value = 160000, min = 100, max = 5e5}
-fwhm = {value = 1.8, min = 0.5, max = 3.5}
+fwhm = {value = 0.7, min = 0.4, max = 0.9}
 alpha = {value = 1.0, min = 1.0, max = 15}
 beta = {value = 1.0, min = 1.0, max = 15}
-mix = {value = 0.6, min = 0.4, max = 0.999}
+mix = {value = 0.8, min = 0.4, max = 0.999}
