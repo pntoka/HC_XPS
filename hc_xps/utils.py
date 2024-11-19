@@ -24,6 +24,6 @@ def extract_energy_intensity(file_path, to_csv=False):
     be_values = [photon_energy - (start_energy + i * width) for i in range(num_points)]
     energy_intensity_data = np.array([be_values, y_values])
     if to_csv:
-        np.savetxt(os.path.join(os.path.dirname(file_path), 'energy_intensity_data.csv'), energy_intensity_data.T, delimiter=',', header='Binding energy / eV, Counts',
+        np.savetxt(os.path.join(os.path.dirname(file_path), os.path.basename(file_path).replace('avg', 'csv')), energy_intensity_data.T, delimiter=',', header='Binding energy / eV,Counts',
                    comments='')
     return energy_intensity_data

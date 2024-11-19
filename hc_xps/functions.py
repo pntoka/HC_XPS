@@ -36,11 +36,15 @@ def LA(x, center, fwhm, alpha, beta, width=False):
 
 
 def LA_conv(x, center, amplitude, fwhm, alpha, beta, mix):
-    la, lhm = LA(x, center, fwhm, alpha, beta, width=True)
+    x_sorted = np.sort(x)
+    la, lhm = LA(x_sorted, center, fwhm, alpha, beta, width=True)
     F_gaussian = lhm * ((1-mix)/mix)
-    g = gaussian_norm(x, center, F_gaussian)
-    la_conv = convolve(la, g, mode='same')
-    la_conv = la_conv / np.max(la_conv)
-    unit_area = abs(np.trapz(la_conv, x))  # This is to get the unit area in order to then get peak height based on amplitude
+    g = gaussian_norm(x_sorted, center, F_gaussian)
+    la_conv = convolve(la, g, mode='full')
+    la_conv_full = la_conv / np.max(la_conv)
+    la_conv = np.interp(x_sorted, np.linspace(x.min(), x.max(), len(la_conv_full)), la_conv_full)
+    unit_area = abs(np.trapezoid(la_conv, x_sorted))  # This is to get the unit area in order to then get peak height based on amplitude
     height = amplitude / unit_area if unit_area != 0 else 0
-    return la_conv * height
+    if x[0] == x_sorted[0]:  # condition if x data is already ascending
+        return la_conv * height
+    return np.flip(la_conv * height)
