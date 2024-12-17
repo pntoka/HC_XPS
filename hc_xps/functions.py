@@ -107,6 +107,6 @@ def calculate_normalised_area(binding_energy, area, rsf, txfn=1.0, photon_energy
     '''
     kinetic_energy = photon_energy - binding_energy
     imfp = calculate_imfp_tpp2m(kinetic_energy)
-    normalised_area = area * rsf * txfn * imfp
+    normalised_area = area / (rsf * txfn * imfp)
     return normalised_area
 
