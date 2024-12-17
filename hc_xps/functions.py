@@ -56,3 +56,57 @@ def LA_peak(x, center, amplitude, fwhm, alpha, beta):
     unit_area = abs(np.trapezoid(la, x))  # This is to get the unit area in order to then get peak height based on amplitude
     height = amplitude / unit_area if unit_area != 0 else 0
     return la * height
+
+
+def calculate_imfp_tpp2m(kinetic_energy):
+    """
+    CODE FROM KherveFitting/libraries/Peak_Functions.py
+
+    Function to  calculate IMFP using TPP-2M formula with average matrix parameters from XPS reference data.
+
+    Parameters:
+        kinetic_energy: electron energy in eV
+
+    Returns:
+        imfp: Inelastic Mean Free Path in nanometers
+
+    Notes:
+    Average matrix parameters derived from metals and inorganic compounds:
+    - N_v = 4.684 (valence electrons per atom)
+    - rho = 6.767 g/cm³ (density)
+    - M = 137.51 g/mol (molecular weight)
+    - E_g = 0 eV (bandgap energy)
+
+    References:
+    1. S.Tanuma, C.J.Powell and D.R.Penn, Surf. Interface Anal., 21, 165-176 (1993)
+    2. Briggs & Grant, "Surface Analysis by XPS and AES" 2nd Ed., Wiley (2003), p.84-85
+    """
+    N_v = 4.684
+    rho = 6.767
+    M = 137.51
+    E_g = 0
+
+    E_p = 28.8 * np.sqrt((N_v * rho) / M)
+    U = N_v * rho / M
+
+    beta = -0.10 + 0.944 / (E_p ** 2 + E_g ** 2) ** 0.5 + 0.069 * rho ** 0.1
+    gamma = 0.191 * rho ** (-0.5)
+    C = 1.97 - 0.91 * U
+    D = 53.4 - 20.8 * U
+
+    imfp = kinetic_energy / (E_p ** 2 * (
+            beta * np.log(gamma * kinetic_energy) -
+            (C / kinetic_energy) +
+            (D / kinetic_energy ** 2))) / 10  # Divide by 10 to convert from Å to nm
+    return imfp
+
+
+def calculate_normalised_area(binding_energy, area, rsf, txfn=1.0, photon_energy=1486.680054):
+    '''
+    Function to calculate the normalised area of a peak.
+    '''
+    kinetic_energy = photon_energy - binding_energy
+    imfp = calculate_imfp_tpp2m(kinetic_energy)
+    normalised_area = area * rsf * txfn * imfp
+    return normalised_area
+
