@@ -48,3 +48,11 @@ def LA_conv(x, center, amplitude, fwhm, alpha, beta, mix):
     if x[0] == x_sorted[0]:  # condition if x data is already ascending
         return la_conv * height
     return np.flip(la_conv * height)
+
+
+def LA_peak(x, center, amplitude, fwhm, alpha, beta):
+    w = 2 * fwhm / (np.sqrt(2 ** (1 / alpha) - 1) + np.sqrt(2 ** (1 / beta) - 1))
+    la = generalized_lorentzian(x, center, w, alpha, beta)
+    unit_area = abs(np.trapezoid(la, x))  # This is to get the unit area in order to then get peak height based on amplitude
+    height = amplitude / unit_area if unit_area != 0 else 0
+    return la * height
