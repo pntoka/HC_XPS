@@ -2,6 +2,7 @@
 import re
 import os
 import numpy as np
+import polars as pl
 
 
 def parse_avg_file(file_path):
@@ -26,4 +27,16 @@ def extract_energy_intensity(file_path, to_csv=False):
     if to_csv:
         np.savetxt(os.path.join(os.path.dirname(file_path), os.path.basename(file_path).replace('avg', 'csv')), energy_intensity_data.T, delimiter=',', header='Binding energy / eV,Counts',
                    comments='')
-    return energy_intensity_data
+    return energy_intensity_data[0], energy_intensity_data[1]
+
+
+def calculate_ratios(carbon_df, oxygen_df):
+    total_carbon_area = carbon_df['Normalised Area'].sum()
+    carbon_oxygen_peaks = ['C', 'D', 'E']
+    total_carbon_oxygen_area = carbon_df.filter(pl.col('Peak ID').is_in(carbon_oxygen_peaks))['Normalised Area'].sum()
+    total_oxygen_area = oxygen_df['Normalised Area'].sum()
+    ratio_data = {
+        'C to O ratio': total_carbon_area / total_oxygen_area,
+        'C-O to O ratio': total_carbon_oxygen_area / total_oxygen_area
+    }
+    return ratio_data

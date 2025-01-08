@@ -1,13 +1,15 @@
 from hc_xps.background import get_shirley_background, remove_background
-from hc_xps.peak_fit import build_casa_lmfit_model, casa_fit_peaks, calculate_rsd
+from hc_xps.peak_fit import build_casa_lmfit_model, casa_fit_peaks, calculate_rsd, find_best_oxygen_fit, extract_fit_results
 from hc_xps.plot import plot_basic_xps, plot_full_peak_fit, plot_xps_with_background
+from hc_xps.utils import extract_energy_intensity, calculate_ratios
 
 
 class XPSData:
-    def __init__(self, energy, intensity, peak_config=None):
+    def __init__(self, element, energy, intensity, peak_config=None):
         '''
         Initialises the XPSData class with energy and intensity data.
         '''
+        self.element = element
         self.energy = energy
         self.intensity = intensity
         self.peak_config = peak_config
@@ -46,13 +48,17 @@ class XPSData:
         '''
         self.peak_config = peak_config
 
-    def lmfit_model(self, peaks_model='6peaks_la', element='carbon', fixed_peaks=None, fixed_mix=False, mix=None):
+    def lmfit_model(self, peaks_model='6peaks_la', fixed_peaks=None, fixed_mix=False, mix=None):
         '''
         Builds the lmfit model.
         '''
-        self.peaks_model = peaks_model
-        fixed_peaks = ['C', 'D', 'E']
-        self.model, self.model_params = build_casa_lmfit_model(self.peaks_model, element, fixed_peaks, fixed_mix, mix, self.peak_config)
+        element = self.element
+        if element == 'carbon':
+            self.peaks_model = peaks_model
+            fixed_peaks = ['C', 'D', 'E']
+            self.model, self.model_params = build_casa_lmfit_model(self.peaks_model, element, fixed_peaks, fixed_mix, mix, self.peak_config)
+        elif element == 'oxygen':
+            print("Oxygen element does not use this method.")
 
     def fit_peaks(self, model='6peaks_la', method='least_squares', fixed_mix=False, mix=None):
         '''
@@ -60,8 +66,11 @@ class XPSData:
         '''
         if self.energy_filtered is None:
             raise ValueError("Background is not calculated. Run get_background() method first.")
-        self.lmfit_model(peaks_model=model, fixed_mix=fixed_mix, mix=mix)
-        self.peak_fit_result = casa_fit_peaks(self.intensity_filtered, self.energy_filtered, self.model, self.model_params, method=method)
+        if self.element == 'carbon':
+            self.lmfit_model(peaks_model=model, fixed_mix=fixed_mix, mix=mix)
+            self.peak_fit_result = casa_fit_peaks(self.intensity_filtered, self.energy_filtered, self.model, self.model_params, method=method)
+        elif self.element == 'oxygen':
+            self.model, self.peak_fit_result, self.model_params, self.peaks_model = find_best_oxygen_fit(self.intensity_filtered, self.energy_filtered, self.peak_config)
     
     def plot_peak_fit(self):
         '''
@@ -69,7 +78,7 @@ class XPSData:
         '''
         if self.peak_fit_result is None:
             raise ValueError("Peak fit is not calculated. Run fit_peaks() method first.")
-        plot_full_peak_fit(self.peak_fit_result, self.energy, self.intensity, self.background, model=self.peaks_model, xps_config=self.peak_config)
+        plot_full_peak_fit(self.peak_fit_result, self.energy, self.intensity, self.background, model=self.peaks_model, element=self.element, xps_config=self.peak_config)
 
     def rsd(self):
         '''
@@ -77,5 +86,76 @@ class XPSData:
         '''
         if self.peak_fit_result is None:
             raise ValueError("Peak fit is not calculated. Run fit_peaks() method first.")
-        intensity_corrected = self.intensity_filtered - self.background[1]
-        return calculate_rsd(intensity_corrected, self.peak_fit_result.best_fit)
+        # intensity_corrected = self.intensity_filtered - self.background[1]
+        return calculate_rsd(self.intensity_filtered + self.background[1], self.peak_fit_result.best_fit + self.background[1])
+    
+    def get_peak_table(self, save_path=None):
+        '''
+        Returns the peak table.
+        '''
+        if self.peak_fit_result is None:
+            raise ValueError("Peak fit is not calculated. Run fit_peaks() method first.")
+        peak_table = extract_fit_results(self.element, self.peaks_model, self.peak_fit_result, self.peak_config)
+        if save_path:
+            peak_table.to_csv(save_path, index=False)
+        return peak_table
+
+
+class SampleXPS():
+    def __init__(self, carbon_path=None, oxygen_path=None, survey_path=None, peak_config=None):
+        self.carbon_path = carbon_path
+        self.oxygen_path = oxygen_path
+        self.survey_path = survey_path
+        self.peak_config = peak_config
+        self.carbon_results = None
+        self.oxygen_results = None
+        pass
+    
+    def load_data(self, carbon_path=None, oxygen_path=None, survey_path=None, peak_config=None):
+        '''
+        Loads the data.
+        '''
+        if carbon_path:
+            self.carbon_path = carbon_path
+        if oxygen_path:
+            self.oxygen_path = oxygen_path
+        if survey_path:
+            self.survey_path = survey_path
+        if peak_config:
+            self.peak_config = peak_config
+        if self.carbon_path:
+            self.carbon_data = XPSData('carbon', *extract_energy_intensity(self.carbon_path), peak_config=self.peak_config)
+        if self.oxygen_path:
+            self.oxygen_data = XPSData('oxygen', *extract_energy_intensity(self.oxygen_path), peak_config=self.peak_config)
+        if self.survey_path:
+            self.survey_data = XPSData('survey', *extract_energy_intensity(self.survey_path), peak_config=self.peak_config)
+    
+    def auto_carbon_fit(self, start_energy=295, end_energy=280, model='6peaks_la', method='least_squares', fixed_mix=False, mix=0.3):
+        '''
+        Automatically fits the carbon peaks.
+        '''
+        if self.carbon_data is None:
+            raise ValueError("Carbon data is not loaded. Run load_data() method first.")
+        self.carbon_data.get_background(start_energy, end_energy)
+        self.carbon_data.fit_peaks(model=model, method=method, fixed_mix=fixed_mix, mix=mix)
+        self.carbon_results = self.carbon_data.peak_fit_result
+
+    def auto_oxygen_fit(self, start_energy=542, end_energy=526):
+        '''
+        Automatically fits the oxygen peaks.
+        '''
+        if self.oxygen_data is None:
+            raise ValueError("Oxygen data is not loaded. Run load_data() method first.")
+        self.oxygen_data.get_background(start_energy, end_energy)
+        self.oxygen_data.fit_peaks()
+        self.oxygen_results = self.oxygen_data.peak_fit_result
+
+    def get_composition(self):
+        '''
+        Returns the composition.
+        '''
+        if self.carbon_results is None or self.oxygen_results is None:
+            raise ValueError("Carbon or oxygen fits are not calculated. Run auto_carbon_fit() and auto_oxygen_fit() methods first.")
+        carbon_df = self.carbon_data.get_peak_table()
+        oxygen_df = self.oxygen_data.get_peak_table()
+        return calculate_ratios(carbon_df, oxygen_df)

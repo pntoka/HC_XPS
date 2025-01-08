@@ -210,3 +210,69 @@ fwhm = {value = 0.7, min = 0.4, max = 0.9}
 alpha = {value = 1.0, min = 1.0, max = 15}
 beta = {value = 1.0, min = 1.0, max = 15}
 mix = {value = 0.8, min = 0.4, max = 0.999}
+
+
+[oxygen]
+
+[oxygen.models]
+4peaks = "A+B+C+D"
+3peaks = "A+B+D"
+2peaks = "A+B"
+
+[oxygen.peaks.A]
+docstring = """
+C=O
+"""
+peak_name = "A"
+peak_type = "Voigt"
+[oxygen.peaks.A.param_hints]
+center = {value = 532, min = 531.5, max = 532.4}
+amplitude = {value = 22000, min = 100, max = 5e5}
+sigma = {value = 0.68, min = 0.1, max = 1}
+gamma = {value = 0.16, min = 0.05, max = 0.6}
+fwhm = {value = 1.8, min = 0.5, max = 3.5}
+mix = {value = 0.2, min = 0.01, max = 1}
+
+[oxygen.peaks.B]
+docstring = """
+C-O
+"""
+peak_name = "B"
+peak_type = "Voigt"
+[oxygen.peaks.B.param_hints]
+center = {value = 533, min = 532.8, max = 534}
+amplitude = {value = 15000, min = 100, max = 5e5}
+sigma = {value = 0.68, min = 0.1, max = 1}
+gamma = {value = 0.16, min = 0.05, max = 0.6}
+fwhm = {value = 1.8, min = 0.5, max = 3.5}
+mix = {value = 0.2, min = 0.01, max = 1}
+
+
+[oxygen.peaks.C]
+docstring = """
+C=O (aromatic)
+"""
+peak_name = "C"
+peak_type = "Voigt"
+[oxygen.peaks.C.param_hints]
+center = {value = 530.9, min = 530.4, max = 531.3}
+amplitude = {value = 12000, min = 100, max = 5e5}
+sigma = {value = 0.68, min = 0.1, max = 1}
+gamma = {value = 0.16, min = 0.05, max = 0.6}
+fwhm = {value = 1.8, min = 0.5, max = 3.5}
+mix = {value = 0.2, min = 0.01, max = 1}
+
+
+[oxygen.peaks.D]
+docstring = """
+water (other)
+"""
+peak_name = "D"
+peak_type = "Voigt"
+[oxygen.peaks.D.param_hints]
+center = {value = 535.5, min = 534, max = 536}
+amplitude = {value = 6600, min = 100, max = 2e4}
+sigma = {value = 0.68, min = 0.1, max = 1}
+gamma = {value = 0.16, min = 0.05, max = 0.6}
+fwhm = {value = 1.8, min = 0.5, max = 3.5}
+mix = {value = 0.2, min = 0.01, max = 1}

@@ -1,5 +1,8 @@
 import numpy as np
 from scipy.signal import convolve
+from scipy.special import erf
+from scipy.optimize import minimize
+from scipy.special import voigt_profile
 
 
 def lorentzian_norm(x, center, F):
@@ -56,6 +59,37 @@ def LA_peak(x, center, amplitude, fwhm, alpha, beta):
     unit_area = abs(np.trapezoid(la, x))  # This is to get the unit area in order to then get peak height based on amplitude
     height = amplitude / unit_area if unit_area != 0 else 0
     return la * height
+
+
+def get_LA_peak_height(x, center, amplitude, fwhm, alpha, beta):
+    w = 2 * fwhm / (np.sqrt(2 ** (1 / alpha) - 1) + np.sqrt(2 ** (1 / beta) - 1))
+    la = generalized_lorentzian(x, center, w, alpha, beta)
+    unit_area = abs(np.trapezoid(la, x))  # This is to get the unit area in order to then get peak height based on amplitude
+    height = amplitude / unit_area if unit_area != 0 else 0
+    return height
+
+
+def sv(x, amplitude, center, sigma, gamma, skew):
+    """
+    Skewed Voigt function
+    """
+    voigt = amplitude * voigt_profile(x-center, sigma, gamma)
+    skew_term = 1 + erf((skew * (x - center)) / (sigma * np.sqrt(2)))
+    sv = voigt * skew_term
+    return sv
+
+
+def get_SV_peak_center_height(x, amplitude, center, sigma, gamma, skew):
+    """
+    Function to get the center and height of a Skewed Voigt peak
+    """
+    x0 = center
+    
+    def neg_sv(x):
+        return -sv(x, amplitude, center, sigma, gamma, skew)
+    
+    result = minimize(neg_sv, x0)
+    return result.x[0], sv(result.x[0], amplitude, center, sigma, gamma, skew)
 
 
 def calculate_imfp_tpp2m(kinetic_energy):

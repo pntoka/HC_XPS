@@ -24,7 +24,7 @@ def plot_xps_with_background(energy, intensity, background):
 
 
 def plot_full_peak_fit(result, energy, intensity, background, model='5peaks', element='carbon', xps_config=None):
-    comps = result.eval_components(x=background[0])
+    comps = result.eval_components(x=result.userkws['x'])
     fig, (ax_residuals, ax_xps) = plt.subplots(2, 1, figsize=(8, 6), sharex=True, gridspec_kw={'height_ratios': [1, 4]})
     if xps_config is None:
         peaks_config = get_peaks_config()
@@ -33,10 +33,13 @@ def plot_full_peak_fit(result, energy, intensity, background, model='5peaks', el
             peaks_config = tomllib.load(file)
     peaks = peaks_config[element]['models'][model].split('+')
     for peak in peaks:
-        ax_xps.plot(background[0], comps[f'{peak}_']+background[1], linestyle='--', label=peaks_config[element]['peaks'][peak]['docstring'].strip())
+        ax_xps.plot(result.userkws['x'], comps[f'{peak}_']+background[1], linestyle='--', label=peaks_config[element]['peaks'][peak]['docstring'].strip())
     ax_xps.scatter(energy, intensity, label='XPS Data', s=5, color='black')
-    ax_xps.plot(background[0], result.best_fit+background[1], label='Fit', linestyle='solid')
-    ax_xps.plot(background[0], background[1], label='Background')
+    # ax_xps.scatter(result.userkws['x'], result.data, label='XPS Data', s=5, color='black')
+    # ax_xps.plot(background[0], result.best_fit+background[1], label='Fit', linestyle='solid')
+    # ax_xps.plot(background[0], background[1], label='Background')
+    ax_xps.plot(result.userkws['x'], result.best_fit+background[1], label='Fit', linestyle='solid')
+    ax_xps.plot(result.userkws['x'], background[1], label='Background')
     ax_xps.legend()
     ax_xps.set_xlabel("Binding Energy (eV)")
     ax_xps.set_ylabel("Intensity (a.u.)")
@@ -44,11 +47,13 @@ def plot_full_peak_fit(result, energy, intensity, background, model='5peaks', el
     ax_xps.ticklabel_format(axis='y', style='sci', scilimits=(0, 0))
     ax_xps.yaxis.get_offset_text().set_fontsize(10)
     ax_xps.invert_xaxis()
-    start_idx = np.argmin(abs(energy - background[0][0]))  # Getting the start and end positions for the intensity envelope
-    end_idx = np.argmin(abs(energy - background[0][-1]))
-    intensity_filtered = intensity[start_idx:end_idx+1]
-    rsd = calculate_rsd(intensity_filtered, result.best_fit+background[1])   # Calculating the RSD using the original data and the best fit witht the added background
-    ax_residuals.plot(background[0], result.residual, color='black')
+    # start_idx = np.argmin(abs(energy - background[0][0]))  # Getting the start and end positions for the intensity envelope
+    # end_idx = np.argmin(abs(energy - background[0][-1]))
+    # intensity_filtered = intensity[start_idx:end_idx+1]
+    # rsd = calculate_rsd(intensity_filtered, result.best_fit+background[1])   # Calculating the RSD using the original data and the best fit witht the added background
+    rsd = calculate_rsd(result.data + background[1], result.best_fit + background[1])
+    # ax_residuals.plot(background[0], result.residual, color='black')
+    ax_residuals.plot(result.userkws['x'], result.residual, color='black')
     ax_residuals.axhline(0, color='gray', linestyle='--')
     ax_residuals.tick_params(axis="x", which="both", bottom=False, labelbottom=False)
     ax_residuals.get_yaxis().set_visible(False)
