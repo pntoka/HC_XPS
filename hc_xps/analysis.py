@@ -174,7 +174,7 @@ class SampleXPS():
         '''
         Runs the full analysis.
         '''
-        if self.carbon_data is None or self.oxygen_data is None:
+        if self.oxygen_path is None or self.carbon_path is None:
             raise ValueError("Carbon or oxygen data is not loaded. Run load_data() method first.")
         self.load_data(carbon_path=self.carbon_path, oxygen_path=self.oxygen_path, survey_path=self.survey_path, peak_config=self.peak_config)
         self.auto_carbon_fit()
