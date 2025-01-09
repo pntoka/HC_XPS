@@ -1,4 +1,3 @@
-'''Code from KherveFitting/libraries/Open.py'''
 import re
 import os
 import numpy as np
@@ -6,6 +5,7 @@ import polars as pl
 
 
 def parse_avg_file(file_path):
+    '''Code from KherveFitting/libraries/Open.py'''
     with open(file_path, 'r') as file:
         content = file.read()
     photon_energy = float(re.search(r'DS_SOPROPID_ENERGY\s+:\s+VT_R4\s+=\s+(\d+\.\d+)', content).group(1))
@@ -31,7 +31,7 @@ def extract_energy_intensity(file_path, to_csv=False):
 
 
 def calculate_ratios(carbon_df, oxygen_df):
-    total_carbon_area = carbon_df['Normalised Area'].sum()
+    total_carbon_area = carbon_df.filter(carbon_df['Peak ID'] != 'F')['Normalised Area'].sum()
     carbon_oxygen_peaks = ['C', 'D', 'E']
     total_carbon_oxygen_area = carbon_df.filter(pl.col('Peak ID').is_in(carbon_oxygen_peaks))['Normalised Area'].sum()
     total_oxygen_area = oxygen_df['Normalised Area'].sum()

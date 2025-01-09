@@ -233,17 +233,18 @@ def extract_fit_results(element, peak_model, fit_result, xps_config=None):
                 fit_result.params['Ala_amplitude'].value,fit_result.params['Ala_fwhm'].value,
                 fit_result.params['Ala_alpha'].value, fit_result.params['Ala_beta'].value)
             data['Height (CPS)'].append(ala_peak_height)
-        if peak == 'Asv':
+        elif peak == 'Asv':
             asv_peak_center, asv_peak_height = get_SV_peak_center_height(
                 fit_result.userkws['x'], fit_result.params['Asv_amplitude'].value,
                 fit_result.params['Asv_center'].value, fit_result.params['Asv_sigma'].value,
                 fit_result.params['Asv_gamma'].value, fit_result.params['Asv_skew'].value)
             data['Height (CPS)'].append(asv_peak_height)
-        data['Height (CPS)'].append(fit_result.params[f'{peak}_height'].value)
+        else:
+            data['Height (CPS)'].append(fit_result.params[f'{peak}_height'].value)
         if peak == 'Ala' or peak == 'Asv':
             data['L/G mix'].append(np.nan)
         else:
-            data['L/G ratio'].append(calculate_lg_mix(fit_result.params[f'{peak}_sigma'].value, fit_result.params[f'{peak}_gamma'].value))
+            data['L/G mix'].append(calculate_lg_mix(fit_result.params[f'{peak}_sigma'].value, fit_result.params[f'{peak}_gamma'].value))
         data['Area'].append(fit_result.params[f'{peak}_amplitude'].value)
         data['Normalised Area'].append(calculate_normalised_area(fit_result.params[f'{peak}_center'].value, fit_result.params[f'{peak}_amplitude'].value, rsf))
         data['Peak type'].append(peaks_config[element]['peaks'][peak]['peak_type'])
@@ -253,13 +254,13 @@ def extract_fit_results(element, peak_model, fit_result, xps_config=None):
         skew_column.extend([np.nan for _ in range(len(peaks)-1)])
         actual_center = [asv_peak_center]
         actual_center.extend([np.nan for _ in range(len(peaks)-1)])
-        df = df.with_column(pl.Series('Skew', skew_column))
-        df = df.with_column(pl.Series('Actual SV Center', actual_center))
+        df = df.with_columns(pl.Series('Skew', skew_column))
+        df = df.with_columns(pl.Series('Actual SV Center', actual_center))
     if 'Ala' in peaks:
         alpha_column = [fit_result.params['Ala_alpha'].value]
         alpha_column.extend([np.nan for _ in range(len(peaks)-1)])
         beta_column = [fit_result.params['Ala_beta'].value]
         beta_column.extend([np.nan for _ in range(len(peaks)-1)])
-        df = df.with_column(pl.Series('Alpha', alpha_column))
-        df = df.with_column(pl.Series('Beta', beta_column))
+        df = df.with_columns(pl.Series('Alpha', alpha_column))
+        df = df.with_columns(pl.Series('Beta', beta_column))
     return df
