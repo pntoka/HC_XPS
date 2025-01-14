@@ -36,7 +36,7 @@ def calculate_ratios(carbon_df, oxygen_df):
     total_carbon_oxygen_area = carbon_df.filter(pl.col('Peak ID').is_in(carbon_oxygen_peaks))['Normalised Area'].sum()
     total_oxygen_area = oxygen_df['Normalised Area'].sum()
     ratio_data = {
-        'C to O ratio': total_carbon_area / total_oxygen_area,
+        'oxygen percentage': total_oxygen_area / (total_carbon_area + total_oxygen_area) * 100,
         'C-O to O ratio': total_carbon_oxygen_area / total_oxygen_area
     }
     return ratio_data

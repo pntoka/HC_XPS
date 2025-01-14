@@ -3,6 +3,8 @@ import numpy as np
 from hc_xps.peak_fit import get_peaks_config, calculate_rsd
 import tomllib
 import matplotlib.ticker as ticker
+from matplotlib.gridspec import GridSpec
+import polars as pl
 
 
 def plot_basic_xps(energy, intensity):
@@ -66,7 +68,7 @@ def plot_xps_with_background(energy, intensity, background):
 #     plt.show()
 
 
-def plot_full_peak_fit(result, energy, intensity, background, model='5peaks', element='carbon', xps_config=None):
+def plot_full_peak_fit(result, energy, intensity, background, model='5peaks', element='carbon', xps_config=None, plot=True):
     comps = result.eval_components(x=result.userkws['x'])
     if xps_config is None:
         peaks_config = get_peaks_config()
@@ -110,8 +112,38 @@ def plot_full_peak_fit(result, energy, intensity, background, model='5peaks', el
     elif element == 'oxygen':
         plt.title("O1s Scan")
     plt.gca().invert_xaxis()
-    plt.show()
+    if plot:
+        plt.show()
+    else:
+        return fig, [ax_main, ax_resid]
 
+
+def full_peak_with_table_fig(fig, axes, peak_table, plot=False):  # needs fixing to have normal looking plot
+    rounded_df = peak_table.with_columns([
+        pl.col(col_name).round(2) for col_name in peak_table.columns if peak_table[col_name].dtype in [pl.Float32, pl.Float64]
+    ])
+    fig.set_size_inches(16, 10)
+    gs = GridSpec(2, 1, height_ratios=[4, 2], figure=fig)
+    main_ax = axes[0]
+    main_ax.set_position(gs[0].get_position(fig))
+    main_ax.set_subplotspec(gs[0])
+    resid_ax = axes[1]
+    # resid_ax.set_position(
+    #     # main_ax.get_position().x0 + 0.0 * main_ax.get_position().width,
+    #     # main_ax.get_position().y0 + 0.85 * main_ax.get_position().height,
+    #     1.0 * main_ax.get_position().width,
+    #     0.15 * main_ax.get_position().height
+    # )
+    resid_ax.set_position(gs[0].get_position(fig))
+    ax_table = fig.add_subplot(gs[1])
+    ax_table.axis('off')
+    table = ax_table.table(cellText=rounded_df.to_numpy(), colLabels=rounded_df.columns, loc='center', cellLoc='center')
+    table.auto_set_font_size(False)
+    table.set_fontsize(10)
+    table.auto_set_column_width(col=list(range(len(peak_table.columns))))
+    if plot:
+        plt.show()
+    return fig
 
 
 # def casa_plot_full_peak_fit():

@@ -1,7 +1,8 @@
 from hc_xps.background import get_shirley_background, remove_background
 from hc_xps.peak_fit import build_casa_lmfit_model, casa_fit_peaks, calculate_rsd, find_best_oxygen_fit, extract_fit_results, build_oxygen_lmfit_model, fit_oxygen_peaks
-from hc_xps.plot import plot_basic_xps, plot_full_peak_fit, plot_xps_with_background
+from hc_xps.plot import plot_basic_xps, plot_full_peak_fit, plot_xps_with_background, full_peak_with_table_fig
 from hc_xps.utils import extract_energy_intensity, calculate_ratios
+import pickle
 
 
 class XPSData:
@@ -78,13 +79,17 @@ class XPSData:
         elif self.element == 'oxygen' and model == '6peaks_la':
             self.model, self.peak_fit_result, self.model_params, self.peaks_model = find_best_oxygen_fit(self.intensity_filtered, self.energy_filtered, self.peak_config)
     
-    def plot_peak_fit(self):
+    def plot_peak_fit(self, plot=True):
         '''
         Plots the peak fit.
         '''
         if self.peak_fit_result is None:
             raise ValueError("Peak fit is not calculated. Run fit_peaks() method first.")
-        plot_full_peak_fit(self.peak_fit_result, self.energy, self.intensity, self.background, model=self.peaks_model, element=self.element, xps_config=self.peak_config)
+        if plot:
+            plot_full_peak_fit(self.peak_fit_result, self.energy, self.intensity, self.background, model=self.peaks_model, element=self.element, xps_config=self.peak_config, plot=plot)
+        if not plot:
+            plot_fig, plot_ax = plot_full_peak_fit(self.peak_fit_result, self.energy, self.intensity, self.background, model=self.peaks_model, element=self.element, xps_config=self.peak_config, plot=plot)
+            return plot_fig, plot_ax
 
     def rsd(self):
         '''
@@ -182,4 +187,26 @@ class SampleXPS():
         self.get_composition()
         self.carbon_data.plot_peak_fit()
         self.oxygen_data.plot_peak_fit()
+        # carbon_fig, carbon_ax = self.carbon_data.plot_peak_fit(plot=False)
+        # oxygen_fig, oxygen_ax = self.oxygen_data.plot_peak_fit(plot=False)
+        # self.oxygen_fig = full_peak_with_table_fig(oxygen_fig, oxygen_ax, self.oxygen_data.peak_table, plot=True)
+        # self.carbon_fig = full_peak_with_table_fig(carbon_fig, carbon_ax, self.carbon_data.peak_table, plot=True)
         print(self.elemental_composition)
+
+    def save_analysis(self, save_path):
+        '''
+        Saves the analysis.
+        '''
+        if self.elemental_composition is None:
+            raise ValueError("Analysis is not run. Run run_analysis() method first.")
+        # save carbon and oxygen lmfit results
+        with open(save_path+'carbon_model_results.pkl', 'wb') as file:
+            pickle.dump(self.carbon_results, file)
+        with open(save_path+'oxygen_model_results.pkl', 'wb') as file:
+            pickle.dump(self.oxygen_results, file)
+        # save carbon and oxygen peak plots with tables
+        # self.carbon_fig.savefig(save_path+'carbon_peak_fit.png', dpi=300)
+        # self.oxygen_fig.savefig(save_path+'oxygen_peak_fit.png', dpi=300)
+        # save elemental composition
+        with open(save_path+'composition.txt', 'w') as file:
+            file.write(str(self.elemental_composition))
