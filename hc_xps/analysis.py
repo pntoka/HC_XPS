@@ -175,7 +175,7 @@ class SampleXPS():
         self.elemental_composition = elemental_composition
         return elemental_composition
     
-    def run_analysis(self):
+    def run_analysis(self, plot=True):
         '''
         Runs the full analysis.
         '''
@@ -185,13 +185,14 @@ class SampleXPS():
         self.auto_carbon_fit()
         self.auto_oxygen_fit()
         self.get_composition()
-        self.carbon_data.plot_peak_fit()
-        self.oxygen_data.plot_peak_fit()
+        if plot:
+            self.carbon_data.plot_peak_fit()
+            self.oxygen_data.plot_peak_fit()
+            print(self.elemental_composition)
         # carbon_fig, carbon_ax = self.carbon_data.plot_peak_fit(plot=False)
         # oxygen_fig, oxygen_ax = self.oxygen_data.plot_peak_fit(plot=False)
         # self.oxygen_fig = full_peak_with_table_fig(oxygen_fig, oxygen_ax, self.oxygen_data.peak_table, plot=True)
         # self.carbon_fig = full_peak_with_table_fig(carbon_fig, carbon_ax, self.carbon_data.peak_table, plot=True)
-        print(self.elemental_composition)
 
     def save_analysis(self, save_path):
         '''

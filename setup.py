@@ -8,7 +8,7 @@ setup(
     package_data={
         "hc_xps": ["spectrum_config/*.toml"]
     },
-    install_requires=['numpy', 'matplotlib', 'lmfit'],
+    install_requires=['numpy', 'matplotlib', 'lmfit', 'polars'],
     python_requires='>=3.11',
     author='Piotr Toka',
     author_email='pnt17@ic.ac.uk',
