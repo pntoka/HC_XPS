@@ -197,7 +197,7 @@ mix = {value = 0.2, min = 0.01, max = 1}
 
 [oxygen.peaks.D]
 docstring = """
-water (other)
+other
 """
 peak_name = "D"
 peak_type = "Voigt"
